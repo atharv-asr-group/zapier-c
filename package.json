@@ -1,0 +1,17 @@
+{
+  "name": "hooks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "github:types/express",
+    "prisma": "^5.18.0",
+    "typescript": "^5.5.4"
+  }
+}
