@@ -35,7 +35,7 @@ function main() {
                     value: (_b = message.value) === null || _b === void 0 ? void 0 : _b.toString(),
                 });
                 // mitigate email sending process, we just simply stop the process for 1 second.
-                yield new Promise(r => setTimeout(r, 5000));
+                yield new Promise(r => setTimeout(r, 500));
                 console.log('processing done');
                 yield consumer.commitOffsets([{
                         topic: TOPIC_NAME,

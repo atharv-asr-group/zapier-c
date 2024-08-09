@@ -24,7 +24,7 @@ async function main(){
 
             })
             // mitigate email sending process, we just simply stop the process for 1 second.
-            await new Promise(r=>setTimeout(r,5000));
+            await new Promise(r=>setTimeout(r,500));
             console.log('processing done');
             await consumer.commitOffsets([{
                 topic:TOPIC_NAME,
