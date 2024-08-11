@@ -6,7 +6,8 @@ export const PrimaryButton=({children, onClick, size="small"}:{
     size?:"big"|"small"
 })=>{
     return <div className={`${size==="small"?"text-sm":"text-xl"}
-    ${size==="small"?"px-4 pt-2":"px-8 py-10"} bg-amber-700`}>
+    ${size==="small"?"px-8 pt-2":"px-8 py-10"} bg-amber-700 
+    cursor-pointer text-white rounded-full hover:shadow-md`}>
         {children}
     </div>
 }
