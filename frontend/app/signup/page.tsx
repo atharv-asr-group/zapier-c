@@ -4,9 +4,13 @@ import { PrimaryButton } from "@/components/buttons/PrimaryButton";
 import { CheckFeature } from "@/components/CheckFeature";
 import { Input } from "@/components/Input";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function(){
     const router= useRouter();
+    const [name,setName]=useState("");
+    const [email,setEmail]=useState("");
+    const [password, setPassword]=useState("");
     return <div>
         <Appbar></Appbar>
         <div className="flex justify-center">
@@ -21,13 +25,13 @@ export default function(){
                 </div>
                 <div className="flex-1 pt-6 mt-12 pb-6 border px-4" >
                     <Input label={"Name"} type="text" placeholder="Your name"  onChange={e=>{
-
+                        setName(e.target.value)
                     }}></Input>
                     <Input label={"Email"} type="text" placeholder="Your Email" onChange={e=>{
-
+                        setEmail(e.target.value)
                     }}></Input>
                     <Input label={"Password"} type="password" placeholder="Password" onChange={e=>{
-
+                        setPassword(e.target.value)
                     }}></Input>
                 <div className="py-2"></div>
                 <PrimaryButton size="big" onClick={()=>{
