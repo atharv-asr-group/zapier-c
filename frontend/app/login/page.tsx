@@ -5,10 +5,12 @@ import { CheckFeature } from "@/components/CheckFeature";
 import { Input } from "@/components/Input";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { BACKEND_URL } from "../config";
+import axios from "axios";
 
 export default function(){
     const router= useRouter();
-    
+
     const [email,setEmail]=useState("");
     const [password, setPassword]=useState("");
 
@@ -35,8 +37,13 @@ export default function(){
                         setPassword(e.target.value);
                     }}></Input>
                 <div className="py-2"></div>
-                <PrimaryButton size="big" onClick={()=>{
-                    router.push("/signup")
+                <PrimaryButton size="big" onClick={async ()=>{
+                    const res= await axios.post(`${BACKEND_URL}/api/v1/user/signup`,{
+                        username:email,
+                        password,
+                    });
+                    localStorage.setItem("token",res.data.token);
+                    router.push("/dashboard");
                 }}>
                     Get Started free
                 </PrimaryButton>
