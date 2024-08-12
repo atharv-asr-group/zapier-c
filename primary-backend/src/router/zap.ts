@@ -76,7 +76,7 @@ router.get("/",authMiddleware,async (req,res)=>{
             }
         }
     })
-    console.log("zaps handler");
+    // console.log("zaps handler");
     return res.json({
         zaps
     })
@@ -107,7 +107,7 @@ router.get("/:zapId",authMiddleware,async (req,res)=>{
             }
         }
     })
-    console.log("zaps handler");
+    // console.log("zaps handler");
     return res.json({
         zap
     })

@@ -1,11 +1,35 @@
 'use client';
+import { BACKEND_URL } from "@/app/config";
 import { Appbar } from "@/components/Appbar";
 import { LinkButton } from "@/components/buttons/LinkButton";
 import { PrimaryButton } from "@/components/buttons/PrimaryButton";
 import { ZapCell } from "@/components/ZapCell";
-import { useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+
+function useAvailableActionsAndTriggers(){
+    const [availableActions,setAvailableActions]=useState([]);
+    const [availableTriggers,setAvailableTriggers]=useState([]);
+
+    useEffect(()=>{
+        axios.get(`${BACKEND_URL}/api/v1/trigger/available`)
+        .then(x=>setAvailableTriggers(x.data.availableTriggers));
+
+        axios.get(`${BACKEND_URL}/api/v1/action/available`)
+        .then(x=>setAvailableActions(x.data.availableActions));
+
+    },[])
+    return {
+        availableActions,
+        availableTriggers
+    }
+}
+
 
 export default function(){
+    const {availableActions, availableTriggers}=useAvailableActionsAndTriggers();
     const [selectedTrigger, setSelectedTrigger]=useState<{
         id:string,
         name:string
@@ -17,10 +41,27 @@ export default function(){
     }[]>([]);
 
     const [selectedModalIndex, setSelectedModalIndex]=useState<null|number>(null);
-
+    const router = useRouter();
 
     return <div>
             <Appbar></Appbar>
+            <div className="flex justify-end bg-slate-200 py-8">
+                <PrimaryButton onClick={async ()=>{
+                    const response = await axios.post(`${BACKEND_URL}/api/v1/zap`,{
+                        "availableTriggerId":selectedTrigger?.id,
+                        "triggerMetadata":{},
+                        "actions":selectedAction.map(a=>({
+                            availableActionId:a.availableActionId,
+                            actionMetadata:{},
+                        }))
+                    },{
+                        headers:{
+                            Authorization:localStorage.getItem("token")
+                        }
+                    })
+                    router.push("/dashboard");
+                }}>Publish</PrimaryButton>
+            </div>
             <div className="w-full min-h-screen bg-slate-200 flex flex-col justify-center ">
                 <div className="flex justify-center w-full">
                     <ZapCell name={selectedTrigger?.name?selectedTrigger.name:"Trigger"} index={1} onClick={()=>{
@@ -56,7 +97,7 @@ export default function(){
                     </div>
             </div>
             {/* this will show modal on screen */}
-            {selectedModalIndex && <Modal index={selectedModalIndex} onSelect={(props:null|{name:string; id:string})=>{
+            {selectedModalIndex && <Modal availableItems={selectedModalIndex===1?availableTriggers:availableActions} index={selectedModalIndex} onSelect={(props:null|{name:string; id:string})=>{
                 if(props===null){
                     // close the modal
                     setSelectedModalIndex(null);
@@ -78,14 +119,16 @@ export default function(){
                         }
                         return newActions;
                     })
-                }
-
-                
-            }}/>}
+                }     
+                setSelectedModalIndex(null);           
+            }} />}
     </div>
 }
 
-function Modal({ index, onSelect}:{index:number, onSelect:(props:null|{name:string; id:string})=>void}){
+function Modal({ index, onSelect, availableItems}:{index:number, onSelect:(props:null|{name:string; id:string})=>void,
+    availableItems:{
+        id: string, name:string, image:string
+}[]}){
     return <div className="fixed top-0 right-0 left-0 z-50 justify-center flex items-center w-full 
     md:inset-0 h-[calc(100%-1rem)] max-h-full bg-slate-100 bg-opacity-70">
         <div className="relative p-4 w-full max-w-2xl max-h-full">
@@ -106,7 +149,20 @@ function Modal({ index, onSelect}:{index:number, onSelect:(props:null|{name:stri
                     </button>
                 </div>
                 <div className="p-4 md:p-5 space-y-4">
-                    fijeif
+                    {availableItems.map(({id,name,image})=>{
+                        return <div onClick={()=>{
+                            onSelect({
+                                id,
+                                name
+                            })
+                        }} className="flex border py-2 hover:bg-orange-100">
+                            <img src={image} width={30}/> 
+                            <div className="px-1">
+                                {name}
+                            </div>
+                            
+                        </div>
+                    })}
                 </div>
             </div>
         </div>
