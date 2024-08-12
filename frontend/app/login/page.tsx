@@ -38,14 +38,14 @@ export default function(){
                     }}></Input>
                 <div className="py-2"></div>
                 <PrimaryButton size="big" onClick={async ()=>{
-                    const res= await axios.post(`${BACKEND_URL}/api/v1/user/signup`,{
+                    const res= await axios.post(`${BACKEND_URL}/api/v1/user/signin`,{
                         username:email,
                         password,
                     });
                     localStorage.setItem("token",res.data.token);
                     router.push("/dashboard");
                 }}>
-                    Get Started free
+                    Login
                 </PrimaryButton>
                 </div>
                 
