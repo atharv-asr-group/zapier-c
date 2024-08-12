@@ -44,6 +44,7 @@ model AvailableTrigger {
   id      String    @id @default(uuid())
   name    String
   triggers Trigger[]
+  image String
 }
 model Action{
   id String @id @default(uuid())
@@ -52,11 +53,13 @@ model Action{
   actionId String
   type AvailableAction @relation(fields: [actionId],references: [id])
   sortingOrder Int @default(0)
+  
 }
 model AvailableAction{
   id      String    @id @default(uuid())
   name    String
   actions Action[]
+  image String
 }
 model ZapRun{
   id String @id @default(uuid())
