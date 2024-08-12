@@ -1,11 +1,13 @@
 export const ZapCell=({
     name,
-    index
+    index,
+    onClick
 }:{
     name?:string,
-    index:number
+    index:number,
+    onClick:()=>void
 })=>{
-    return <div className="flex justify-center border border-black py-8 px-8 w-[300px]">
+    return <div onClick={onClick} className="flex justify-center border border-black py-8 px-8 w-[300px] cursor-pointer">
         <div className="flex text-xl">
             <div className="font-bold">
                 {index}. 
