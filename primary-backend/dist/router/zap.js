@@ -37,7 +37,8 @@ router.post("/", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, vo
                 actions: {
                     create: parsedData.data.actions.map((x, index) => ({
                         actionId: x.availableActionId,
-                        sortingOrder: index
+                        sortingOrder: index,
+                        metadata: x.actionMetadata
                     }))
                 }
             }
@@ -45,7 +46,7 @@ router.post("/", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, vo
         const trigger = yield tx.trigger.create({
             data: {
                 triggerId: parsedData.data.availableTriggerId,
-                zapId: zap.id
+                zapId: zap.id,
             }
         });
         yield db_1.prismaClient.zap.update({
@@ -82,7 +83,7 @@ router.get("/", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, voi
             }
         }
     });
-    console.log("zaps handler");
+    // console.log("zaps handler");
     return res.json({
         zaps
     });
@@ -110,7 +111,7 @@ router.get("/:zapId", middleware_1.authMiddleware, (req, res) => __awaiter(void 
             }
         }
     });
-    console.log("zaps handler");
+    // console.log("zaps handler");
     return res.json({
         zap
     });

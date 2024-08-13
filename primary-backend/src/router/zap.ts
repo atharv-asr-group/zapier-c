@@ -28,7 +28,8 @@ router.post("/",authMiddleware,async (req,res)=>{
                 actions:{
                     create: parsedData.data.actions.map((x,index)=>({
                         actionId: x.availableActionId,
-                        sortingOrder: index
+                        sortingOrder: index,
+                        metadata: x.actionMetadata
                     }))
                 }
             }
@@ -37,7 +38,8 @@ router.post("/",authMiddleware,async (req,res)=>{
         const trigger= await tx.trigger.create({
             data:{
                 triggerId: parsedData.data.availableTriggerId,
-                zapId: zap.id
+                zapId: zap.id,
+                
             }
         });
         await prismaClient.zap.update({
