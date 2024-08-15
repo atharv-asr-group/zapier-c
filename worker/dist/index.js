@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 // infinite loop that that pulls from the queue and process them
 const kafkajs_1 = require("kafkajs");
+const parser_1 = require("./parser");
 // const client= new PrismaClient();
 const TOPIC_NAME = "zap-events";
 // init kafka
@@ -32,7 +33,7 @@ function main() {
         yield consumer.run({
             autoCommit: false,
             eachMessage: (_a) => __awaiter(this, [_a], void 0, function* ({ topic, partition, message }) {
-                var _b, _c, _d;
+                var _b, _c, _d, _e, _f, _g, _h;
                 console.log({
                     partition,
                     offset: message.offset,
@@ -64,12 +65,19 @@ function main() {
                 if (!currentAction) {
                     console.log("current action not found");
                 }
+                const zapRunMetadata = zapRunDetails === null || zapRunDetails === void 0 ? void 0 : zapRunDetails.metadata;
                 if ((currentAction === null || currentAction === void 0 ? void 0 : currentAction.type.id) === "email") {
-                    console.log("sending email");
+                    const body = (0, parser_1.parse)((_e = currentAction.metadata) === null || _e === void 0 ? void 0 : _e.body, zapRunMetadata);
+                    const to = (0, parser_1.parse)((_f = currentAction.metadata) === null || _f === void 0 ? void 0 : _f.email, zapRunMetadata);
+                    console.log(body);
+                    console.log(`sending out email to ${to} with body ${body}`);
                 }
                 if ((currentAction === null || currentAction === void 0 ? void 0 : currentAction.type.id) === "send-sol") {
-                    console.log("sending sol");
+                    const amount = (0, parser_1.parse)((_g = currentAction.metadata) === null || _g === void 0 ? void 0 : _g.amount, zapRunMetadata);
+                    const address = (0, parser_1.parse)((_h = currentAction.metadata) === null || _h === void 0 ? void 0 : _h.address, zapRunMetadata);
+                    console.log(`sending out solana to ${address} with amount ${amount}`);
                 }
+                console.log(currentAction);
                 // mitigate email sending process, we just simply stop the process for 1 second.
                 yield new Promise(r => setTimeout(r, 500));
                 const lastStage = ((zapRunDetails === null || zapRunDetails === void 0 ? void 0 : zapRunDetails.zap.actions.length) || 1) - 1;

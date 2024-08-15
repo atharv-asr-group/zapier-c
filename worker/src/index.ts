@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client';
+import { JsonObject } from '@prisma/client/runtime/library';
 // infinite loop that that pulls from the queue and process them
 import {Kafka} from 'kafkajs';
+import { parse } from './parser';
 // const client= new PrismaClient();
 const TOPIC_NAME="zap-events";
 // init kafka
@@ -55,12 +57,22 @@ async function main(){
             if(!currentAction){
                 console.log("current action not found");
             }
+            const zapRunMetadata=zapRunDetails?.metadata;
+
             if(currentAction?.type.id==="email"){
-                console.log("sending email")
+                const body = parse((currentAction.metadata as JsonObject)?.body as string, zapRunMetadata);
+                const to = parse((currentAction.metadata as JsonObject)?.email as string, zapRunMetadata);
+                console.log(body);
+                console.log(`sending out email to ${to} with body ${body}`)
             }
             if(currentAction?.type.id==="send-sol"){
-                console.log("sending sol")
+                const amount = parse((currentAction.metadata as JsonObject)?.amount as string, zapRunMetadata);
+                const address = parse((currentAction.metadata as JsonObject)?.address as string, zapRunMetadata);
+
+                console.log(`sending out solana to ${address} with amount ${amount}`)
+            
             }
+            console.log(currentAction);
 
             // mitigate email sending process, we just simply stop the process for 1 second.
             await new Promise(r=>setTimeout(r,500));
