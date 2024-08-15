@@ -9,6 +9,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "prisma":{
+    "seed":"ts-node dist/seed.ts"
+    },
   "dependencies": {
     "@prisma/client": "^5.18.0",
     "@types/cors": "^2.8.17",

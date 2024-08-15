@@ -31,7 +31,7 @@ async function main(){
             topic:TOPIC_NAME,
             messages: pendingRows.map(r=>{
                 return {
-                    value: r.zapRunId
+                    value: JSON.stringify({zapId:r.zapRunId, stage: 0})
                 }
         })
             ,
