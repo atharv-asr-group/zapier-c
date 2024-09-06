@@ -1,9 +1,18 @@
-**Table of content:**
+# Video For Architecture Explaination and Demo:
+[![Video Title](https://img.youtube.com/vi/ya45LzEkH4k/0.jpg)](https://youtu.be/ya45LzEkH4k)
+
+https://www.youtube.com/watch?v=ya45LzEkH4k
+
+(Recommendation: watch the video at 1.5x for better experience)
+
+
+
+## **Table of content:**
 1. project architecture
 2. Details
 3. Setup guide
 
-**Project architecture:**
+## **Project architecture:**
 
 The project consists of 4 *microservices* and a seperate frontend. 
 
