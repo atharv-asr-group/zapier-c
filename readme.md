@@ -1,4 +1,4 @@
-# Zapier-C Master Project
+# Zapier
 
 This project is a microservices-based architecture that allows users to create and manage workflows (zaps). It consists of four microservices and a separate frontend built with Next.js. The project integrates with Kafka for message queuing and PostgreSQL for database management.
 
