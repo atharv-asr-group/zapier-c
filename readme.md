@@ -1,95 +1,171 @@
-# Video For Architecture Explaination and Demo:
-[![Video Title](https://img.youtube.com/vi/ya45LzEkH4k/0.jpg)](https://youtu.be/ya45LzEkH4k)
+# Zapier-C Master Project
 
-https://www.youtube.com/watch?v=ya45LzEkH4k
+This project is a microservices-based architecture that allows users to create and manage workflows (zaps). It consists of four microservices and a separate frontend built with Next.js. The project integrates with Kafka for message queuing and PostgreSQL for database management.
 
-(Recommendation: watch the video at 1.5x for better experience)
+---
 
+## **Table of Contents**
+1. [Project Architecture](#project-architecture)
+2. [Details](#details)
+3. [Setup Guide](#setup-guide)
+4. [Running the Project](#running-the-project)
+5. [Deployment](#deployment)
+6. [Learn More](#learn-more)
 
+---
 
-## **Table of content:**
-1. project architecture
-2. Details
-3. Setup guide
+## **Project Architecture**
 
-## **Project architecture:**
-
-The project consists of 4 *microservices* and a seperate frontend. 
+The project consists of the following components:
 
 ![image](https://github.com/user-attachments/assets/86848e60-0bf6-4967-9f62-b5380048e606)
 
-On the frontend, users can signup on their accounts, they can create their zaps that are then stored in the database by the primary backend.
-Some hooks endpoints are exposed for the users using which the users can hit these endpoints which starts to put their actions one by one in the database. 
-The processor microservice then pulls these actions from the database and put them on *kafka*, which are consumed by various workers to perform these actions.
+- **Frontend**: A Next.js application where users can sign up, create workflows (zaps), and manage them.
+- **Primary Backend**: Handles user authentication and stores workflows in the database.
+- **Hooks Microservice**: Exposes endpoints for triggering workflows and storing actions in the database.
+- **Processor Microservice**: Pulls actions from the database and pushes them to Kafka.
+- **Worker Microservice**: Consumes actions from Kafka and performs the required tasks.
 
+### Workflow Overview:
 
-**Details:**
+1. Users create workflows on the frontend.
+2. Workflows are stored in the database by the primary backend.
+3. Hooks endpoints allow users to trigger workflows, storing actions in the database.
+4. The processor microservice pushes actions to Kafka.
+5. Workers consume actions from Kafka and execute them.
 
-Landing page
+---
 
-![image](https://github.com/user-attachments/assets/be05a22a-60ee-4ccc-af87-fd654be7043c)
+## **Details**
 
-Click on Signup and create an account
+### Landing Page
+![Landing Page](https://github.com/user-attachments/assets/be05a22a-60ee-4ccc-af87-fd654be7043c)
 
-![image](https://github.com/user-attachments/assets/31dd9538-78c6-42cc-a4c3-398917b7fe3f)
+### Workflow Creation
+![Workflow Creation](https://github.com/user-attachments/assets/4df869c6-e799-42f3-b553-27bc3888ce55)
 
-Once you login, you will come to the home page where you can see and create new zap workflows, Click on create
+### Dashboard
+![Dashboard](https://github.com/user-attachments/assets/1c494694-c63a-4206-b437-0eec2e1f24b9)
 
-![image](https://github.com/user-attachments/assets/4df869c6-e799-42f3-b553-27bc3888ce55)
+### Kafka Integration
+The processor microservice pushes actions to Kafka, and workers consume these actions to perform tasks.
 
-Select the actions you want to be performed
+---
 
-![image](https://github.com/user-attachments/assets/cbe5f6be-fe11-4969-ad71-b04d2efa4a66)
+## **Setup Guide**
 
-Once you have created your workflow click on publish
+### Prerequisites
+- Node.js installed
+- Docker installed
+- PostgreSQL instance (e.g., from [neon.tech](https://neon.tech))
 
-![image](https://github.com/user-attachments/assets/1c494694-c63a-4206-b437-0eec2e1f24b9)
+### Steps
 
-You will see your updated dashboard, with the given webhook urls.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/atharv-asr-group/zapier-c.git
+   cd zapier-c
+   ```
 
-![image](https://github.com/user-attachments/assets/b00d39a4-0f7b-41fa-a35a-9d3710c0f416)
+2. Install dependencies and create `.env` files:
+   ```bash
+   cd primary-backend
+   npm install
+   mkdir .env
+   ```
 
+   Repeat the above steps for `hooks`, `processor`, and `worker`.
 
-We can now hit this webhook url via *postman* or other services (along with valid body) to trigger our workflows and they will start to perform the actions one by one.
+3. Add the following to each `.env` file:
+   ```
+   DATABASE_URL="your_connection_url"
+   ```
 
-![image](https://github.com/user-attachments/assets/f021a55e-a134-4075-8eb7-ed60082eff00)
+4. Migrate the database:
+   ```bash
+   cd primary-backend
+   npx prisma migrate dev
+   ```
 
-Our worker consumes the actions from *kafka* which is also logged on the terminal.
+5. Generate Prisma clients:
+   ```bash
+   cd worker
+   npx prisma generate
 
-![image](https://github.com/user-attachments/assets/9c6c7fb0-70c6-4922-85a2-a30111fcca96)
+   cd hooks
+   npx prisma generate
 
+   cd processor
+   npx prisma generate
+   ```
 
+6. Set up Kafka:
+   ```bash
+   docker run -p 9092:9092 -d apache/kafka:3.7.1
+   ```
 
-**Setup guide:**
-Clone the project using: git clone https://github.com/atharv-asr-group/zapier-c.git
+7. Create a Kafka topic:
+   ```bash
+   docker exec {container_id_of_kafka} /bin/bash
+   cd /opt/kafka/bin
+   ./kafka-topics.sh --create --topic zap-events --bootstrap-server localhost:9092
+   exit
+   ```
 
-Add .env file to the hooks, primary-backend, worker, processor by following the commands:
-1. cd worker->npm install->mkdir .env
-2. cd primary-backend->npm install->mkdir .env
-3. cd hooks->npm install->mkdir .env
-4. cd processor->npm install->mkdir .env
+---
 
-Get a postgresql instance from any free service and get the connection url, you can use neon.tech for the same.
-In the .env files, add DATABASE_URL="your_connection_url"
+## **Running the Project**
 
-Go to the primary-backend and migrate the database: cd primary-backend -> npx prisma migrate dev
+Start each service in a separate terminal window:
 
-Generate the *prisma client* in worker, hooks, and processor by the following steps:
-1. cd worker -> npx prisma generate
-2. cd hooks -> npx prisma generate
-3. cd processor -> npx prisma generate
+1. **Primary Backend**:
+   ```bash
+   cd primary-backend
+   npm run dev
+   ```
 
-The processor microservice is taking the actions from DB and producing it to the kafka queue, which means that we have to generate a ***kafka*** instance followed by creating a topic:
-1. Open Docker desktop application
-2. ***run docker run -p 9092:9092 -d apache/kafka:3.7.1***
-3. docker exec {container_id of kafka} /bin/bash
-4. cd /opt/kafka/bin
-5. ./kafka-topics.sh --create --topic zap-events --bootstrap-server localhost:9092          (this will create a topic named zap-events)
-6. exit
+2. **Frontend**:
+   ```bash
+   cd frontend
+   npm run dev
+   ```
 
-Now we are ready to start all the microservices and the frontend, write the following steps in different terminal windows:
-1. cd primary-backend -> npm run dev
-2. cd frontend -> npm run dev
-3. cd hooks -> npm run start
-4. cd processor -> npm run start
-5. cd worker -> npm run start
+3. **Hooks Microservice**:
+   ```bash
+   cd hooks
+   npm run start
+   ```
+
+4. **Processor Microservice**:
+   ```bash
+   cd processor
+   npm run start
+   ```
+
+5. **Worker Microservice**:
+   ```bash
+   cd worker
+   npm run start
+   ```
+
+Access the frontend at [http://localhost:3000](http://localhost:3000).
+
+---
+
+## **Deployment**
+
+### Frontend
+The easiest way to deploy the frontend is via [Vercel](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
+
+### Backend and Microservices
+Deploy the backend and microservices on a cloud provider or container orchestration platform like Kubernetes or Docker Swarm.
+
+---
+
+## **Learn More**
+
+- [Next.js Documentation](https://nextjs.org/docs) - Learn about Next.js features and API.
+- [Kafka Documentation](https://kafka.apache.org/documentation/) - Learn about Kafka.
+- [Prisma Documentation](https://www.prisma.io/docs/) - Learn about Prisma.
+
+---
